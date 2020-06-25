@@ -69,22 +69,18 @@ export const getCatalogFilterItemByType = (filterType: EntityGroup) => {
 
 type EntityFilter = (entity: Entity, options: EntityFilterOptions) => boolean;
 
-type EntityFilterOptions = Partial<{
-  isStarred: boolean;
+export type EntityFilterOptions = {
+  isStarred: (entity: Entity) => boolean;
   userId: string;
-}>;
-
-type Owned = {
-  owner: string;
 };
 
 export const entityFilters: Record<string, EntityFilter> = {
-  [EntityGroup.OWNED]: (e, { userId }) => {
-    const owner = (e.spec! as Owned).owner;
-    return owner === userId;
-  },
+  [EntityGroup.OWNED]: (e, { userId }) => e.spec?.owner === userId,
   [EntityGroup.ALL]: () => true,
-  [EntityGroup.STARRED]: (_, { isStarred }) => !!isStarred,
+  [EntityGroup.STARRED]: (e, { isStarred }) => {
+    console.log(isStarred);
+    return isStarred(e);
+  },
 };
 
 export const entityTypeFilter = (e: Entity, type: string) =>
